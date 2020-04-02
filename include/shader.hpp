@@ -10,7 +10,7 @@ private:
     unsigned int m_ID;
     unsigned int compile(unsigned int type, const std::string &source);
 public:
-    Shader(std::string vertex_path, std::string fragment_path);
+    Shader(std::string vertex_path, std::string fragment_path, std::string geometry_path);
     unsigned int get_id(void) { return m_ID; }
     void use(void);
 

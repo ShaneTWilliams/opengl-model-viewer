@@ -11,14 +11,16 @@
 
 #include "error_checking.hpp"
 
-Shader::Shader(std::string vertex_path, std::string fragment_path)
+Shader::Shader(std::string vertex_path, std::string fragment_path, std::string geometry_path)
 {
     GL_CALL(unsigned int program = glCreateProgram());
     unsigned int vertex_shader = compile(GL_VERTEX_SHADER, vertex_path);
     unsigned int fragment_shader = compile(GL_FRAGMENT_SHADER, fragment_path);
+    unsigned int geometry_shader = compile(GL_GEOMETRY_SHADER, geometry_path);
 
     GL_CALL(glAttachShader(program, vertex_shader));
     GL_CALL(glAttachShader(program, fragment_shader));
+    GL_CALL(glAttachShader(program, geometry_shader));
     GL_CALL(glLinkProgram(program));
     int result;
     char error_log[512];
@@ -32,6 +34,7 @@ Shader::Shader(std::string vertex_path, std::string fragment_path)
 
     GL_CALL(glDeleteShader(vertex_shader));
     GL_CALL(glDeleteShader(fragment_shader));
+    GL_CALL(glDeleteShader(geometry_shader));
 
     m_ID = program;
 }

@@ -14,8 +14,10 @@ struct Light {
     vec3 position;
 };
 
-in vec3 frag_pos;  
-in vec3 frag_norm;
+in FragData {
+    vec3 frag_pos;  
+    vec3 frag_norm;
+} fs_in;
 
 out vec4 frag_color;  
 
@@ -27,12 +29,12 @@ void main()
 {
     vec3 ambient = light.ambient * material.ambient;
 
-    vec3 unit_frag_norm = normalize(frag_norm);
-    vec3 light_dir = normalize(light.position - frag_pos);  
+    vec3 unit_frag_norm = normalize(fs_in.frag_norm);
+    vec3 light_dir = normalize(light.position - fs_in.frag_pos);  
     float diffuse_mag = max(dot(unit_frag_norm, light_dir), 0.0);
     vec3 diffuse = light.diffuse * (diffuse_mag * material.diffuse);
 
-    vec3 view_dir = normalize(view_pos - frag_pos);
+    vec3 view_dir = normalize(view_pos - fs_in.frag_pos);
     vec3 reflect_dir = reflect(light_dir, unit_frag_norm);  
     float spec = pow(max(dot(view_dir, reflect_dir), 0.0), material.shininess);
     vec3 specular = light.specular * (spec * material.specular);  
