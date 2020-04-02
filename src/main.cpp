@@ -8,7 +8,7 @@
 #include <OpenGL/gl3.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image/stb_image.h"
+#include "stbimage/stb_image.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -40,6 +40,8 @@ int main(void)
     if (!glfwInit())
         return -1;
 
+    glfwWindowHint(GLFW_SAMPLES, 4);
+
     #ifdef __APPLE__
         // We need to explicitly ask for a 4.1 context on OS X
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -64,14 +66,14 @@ int main(void)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     GL_CALL(glEnable(GL_DEPTH_TEST));
+    GL_CALL(glEnable(GL_CULL_FACE));  
+    GL_CALL(glEnable(GL_MULTISAMPLE));  
 
-    // Shader shader("shaders/stl/vertex.glsl", "shaders/stl/fragment.glsl");
+    Shader shader("shaders/model/vertex.glsl", "shaders/model/fragment.glsl", "shaders/model/geometry.glsl");
 
-    // Model ourModel("res/models/hand.STL");
+    Model ourModel("alien.stl");
 
-    glm::mat4 model = glm::mat4(1.0f);
-    shader.use();
-    shader.setMat4("model", model);
+   
 
     float deltaTime,
     currentFrame, lastFrame = 0;
@@ -83,19 +85,40 @@ int main(void)
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        
+
         GL_CALL(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-        // camera/world stuff
+        // model/world matrices
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0, 0.0, 0.0));
+        model = glm::scale(model, glm::vec3(0.05));
+        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
+        //model = glm::rotate(model, glm::radians((float)glfwGetTime()*50), glm::vec3(0.0, 1.0, 0.0));
         glm::mat4 view = camera.getViewMatrix();
         glm::mat4 projection = camera.getProjMatrix();
+
         // vertex shader uniforms
         shader.use();
+        shader.setFloat("distance", 0);
+        shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-        
+        // fragment shader uniforms
+        shader.setVec3("material.ambient", glm::vec3(0.7, 0.7, 0.7));
+        shader.setVec3("material.diffuse", glm::vec3(0.8, 0.8, 0.8));
+        shader.setVec3("material.specular", glm::vec3(0.1, 0.1, 0.1));
+        shader.setFloat("material.shininess", 32.0f);
+        shader.setVec3("light.ambient",  glm::vec3(0.2, 0.2, 0.2));
+        shader.setVec3("light.diffuse",  glm::vec3(0.5, 0.5, 0.5)); 
+        shader.setVec3("light.specular", glm::vec3(0.8, 0.8, 0.8)); 
+        shader.setVec3("light.position", glm::vec3(50.0, 50.0, 50.0));
         ourModel.Draw(shader);
+        // model = glm::mat4(1.0f);
+        // model = glm::translate(model, glm::vec3(5.0, 5.0, 5.0));
+        // model = glm::scale(model, glm::vec3(0.05, 0.05, 0.05));
+        // shader.setMat4("model", model);
+        // ourModel.Draw(shader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
