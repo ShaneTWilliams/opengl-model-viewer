@@ -26,8 +26,8 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
 Camera camera;
 
-const unsigned int SCR_WIDTH = 1000;
-const unsigned int SCR_HEIGHT = 750;
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
 float last_x = SCR_WIDTH / 2.0f;
 float last_y = SCR_HEIGHT / 2.0f;
 bool first_mouse = true;
@@ -35,8 +35,6 @@ float explode_distance = 2.0;
 
 int main(void)
 {
-    GLFWwindow *window;
-
     // Initialize glfw
     if (!glfwInit())
         return -1;
@@ -52,7 +50,11 @@ int main(void)
     #endif
 
     // Create a windowed mode window and its OpenGL context
-    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Renderer", NULL, NULL);
+    GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    int window_width = mode->width;
+    int window_height = mode->height;
+    GLFWwindow *window = glfwCreateWindow(window_width, window_height, "STL Model Viewer", monitor, NULL);
     if (!window)
     {
         glfwTerminate();
