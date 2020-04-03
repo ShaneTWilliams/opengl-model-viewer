@@ -31,6 +31,7 @@ const unsigned int SCR_HEIGHT = 750;
 float last_x = SCR_WIDTH / 2.0f;
 float last_y = SCR_HEIGHT / 2.0f;
 bool first_mouse = true;
+float explode_distance = 2.0;
 
 int main(void)
 {
@@ -63,7 +64,6 @@ int main(void)
     glfwSwapInterval(1);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     GL_CALL(glEnable(GL_DEPTH_TEST));
     GL_CALL(glEnable(GL_CULL_FACE));  
@@ -94,13 +94,16 @@ int main(void)
         model = glm::translate(model, glm::vec3(0.0, -1.0, 0.0));
         model = glm::scale(model, glm::vec3(0.05));
         model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-        //model = glm::rotate(model, glm::radians((float)glfwGetTime()*50), glm::vec3(0.0, 1.0, 0.0));
         glm::mat4 view = camera.getViewMatrix();
         glm::mat4 projection = camera.getProjMatrix();
 
         // vertex shader uniforms
         shader.use();
-        shader.setFloat("distance", 0);
+        if (explode_distance > 0)
+        {
+            explode_distance -= 0.01;
+        }
+        shader.setFloat("distance", explode_distance);
         shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
