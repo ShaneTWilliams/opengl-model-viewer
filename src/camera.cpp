@@ -4,73 +4,79 @@
 
 #include <iostream>
 
-void Camera::updateCameraVectors()
+Camera::Camera(void)
 {
-    // Calculate the new Front vector
-    glm::vec3 front;
-    front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-    front.y = sin(glm::radians(m_pitch));
-    front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
-    m_front_vec = glm::normalize(front);
-    // Also re-calculate the Right and Up vector
-    m_right_vec = glm::normalize(glm::cross(m_front_vec, m_world_up_vec)); // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-    m_up_vec = glm::normalize(glm::cross(m_right_vec, m_front_vec));
-}
-
-void Camera::processKeyboard(MovementDirection direction, float delta_time, bool slow)
-{
-    float velocity = m_movement_speed * delta_time;
-    if (slow)
-    {
-        velocity *= 0.3;
-    }
-    if (direction == MovementDirection::FORWARD)
-    {
-        m_position_coords += m_front_vec * velocity;
-    }
-    if (direction == MovementDirection::BACKWARD)
-    {
-        m_position_coords -= m_front_vec * velocity;
-    }
-    if (direction == MovementDirection::LEFT)
-    {
-        m_position_coords -= m_right_vec * velocity;
-    }
-    if (direction == MovementDirection::RIGHT)
-    {
-        m_position_coords += m_right_vec * velocity;
-    }
-}
-
-void Camera::processMouseMovement(float x_offset, float y_offset)
-{
-    m_yaw += x_offset * m_mouse_sensitivity;
-    m_pitch += y_offset * m_mouse_sensitivity;
-
-    // Make sure that when pitch is out of bounds, screen doesn't get flipped
-    if (m_pitch > 89.0f)
-        m_pitch = 89.0f;
-    if (m_pitch < -89.0f)
-        m_pitch = -89.0f;
-
-    // Update Front, Right and Up Vectors using the updated Euler angles
     updateCameraVectors();
 }
 
-void Camera::processScroll(double y_offset)
+void Camera::updateCameraVectors(void)
 {
-    if (m_fov - y_offset >= 30.0f && m_fov - y_offset <= 90.0f)
-        m_fov -= y_offset;
+    m_position_coords = glm::vec3(
+        glm::cos(glm::radians(m_position_xangle)) * glm::cos(glm::radians(m_position_yangle)),
+        glm::sin(glm::radians(m_position_yangle)),
+        glm::sin(glm::radians(m_position_xangle)) * glm::cos(glm::radians(m_position_yangle))
+    );
+    m_position_coords *= glm::vec3(m_distance);
+    m_front_vec = glm::normalize(m_position_coords) * glm::vec3(-1.0);
+    m_right_vec = glm::normalize(glm::cross(m_front_vec, m_WORLD_UP_VEC));
+    m_up_vec = glm::normalize(glm::cross(m_right_vec, m_front_vec));
+}
+
+void Camera::orbit(float x_offset, float y_offset)
+{
+    m_position_xangle += x_offset * m_mouse_sensitivity;
+    m_position_yangle -= y_offset * m_mouse_sensitivity;
+
+    while (m_position_xangle >= 360.0)
+    {
+        m_position_xangle -= 360.0;
+    }
+    while (m_position_xangle <= 0.0)
+    {
+        m_position_xangle += 360.0;
+    }
+    if (m_position_yangle >= 90.0)
+    {
+        m_position_yangle = 89.0;
+    }
+    if (m_position_yangle <= -90.0)
+    {
+        m_position_yangle = -89.0;
+    }
+    updateCameraVectors();
+}
+
+void Camera::zoom(double y_offset)
+{
+    m_distance -= y_offset;
+
+    if (m_distance < 1.0)
+    {
+        m_distance = 1.0;
+    }
+
+    updateCameraVectors();
+}
+
+void Camera::widenFov(void)
+{
+    if (m_fov + m_fov_interval <= 90.0f)
+        m_fov += m_fov_interval;
+}
+
+void Camera::narrowFov(void)
+{
+    if (m_fov - m_fov_interval >= 30.0f)
+        m_fov -= m_fov_interval;
 }
 
 glm::mat4 Camera::getViewMatrix(void)
 {
-    return glm::lookAt(m_position_coords, m_position_coords + m_front_vec, m_up_vec);
+    return glm::lookAt(m_position_coords, glm::vec3(0.0, 0.0, 0.0), m_up_vec);
 }
 
 glm::mat4 Camera::getProjMatrix(void)
 {
     return glm::perspective(glm::radians(m_fov), 800.0f / 600.0f, 0.1f, 100.0f);
-    ;
 }
 

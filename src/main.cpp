@@ -91,7 +91,7 @@ int main(void)
 
         // model/world matrices
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0, 0.0, 0.0));
+        model = glm::translate(model, glm::vec3(0.0, -1.0, 0.0));
         model = glm::scale(model, glm::vec3(0.05));
         model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
         //model = glm::rotate(model, glm::radians((float)glfwGetTime()*50), glm::vec3(0.0, 1.0, 0.0));
@@ -143,21 +143,14 @@ void process_input(GLFWwindow *window, float delta_time)
         glfwSetWindowShouldClose(window, true);
     }
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS)
     {
-        camera.processKeyboard(MovementDirection::FORWARD, delta_time, slow);
+        camera.narrowFov();
     }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+
+    if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS)
     {
-        camera.processKeyboard(MovementDirection::BACKWARD, delta_time, slow);
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        camera.processKeyboard(MovementDirection::LEFT, delta_time, slow);
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        camera.processKeyboard(MovementDirection::RIGHT, delta_time, slow);
+        camera.widenFov();
     }
 }
 
@@ -176,10 +169,13 @@ void mouse_callback(GLFWwindow *window, double x_pos, double y_pos)
     last_x = x_pos;
     last_y = y_pos;
 
-    camera.processMouseMovement(x_offset, y_offset);
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+    {
+        camera.orbit(x_offset, y_offset);
+    }
 }
 
 void scroll_callback(GLFWwindow *window, double x_offset, double y_offset)
 {
-    camera.processScroll(y_offset);
+    camera.zoom(y_offset);
 }
