@@ -105,6 +105,10 @@ int main(void)
         {
             explode_distance -= 0.01;
         }
+        else
+        {
+            explode_distance = 0;
+        }
         shader.setFloat("distance", explode_distance);
         shader.setMat4("model", model);
         shader.setMat4("view", view);
