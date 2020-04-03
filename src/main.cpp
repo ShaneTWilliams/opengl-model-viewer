@@ -7,8 +7,6 @@
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl3.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stbimage/stb_image.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
