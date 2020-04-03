@@ -34,25 +34,34 @@ float explode_distance = 2.0;
 
 int main(void)
 {
-    // Initialize glfw
+    INIReader config("config.ini");
+
     if (!glfwInit())
         return -1;
 
     glfwWindowHint(GLFW_SAMPLES, 4);
-
-    #ifdef __APPLE__
-        // We need to explicitly ask for a 4.1 context on OS X
+    // We need to explicitly ask for a 4.1, core profile context on OS X
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    #endif
 
-    // Create a windowed mode window and its OpenGL context
-    GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+    // Open fullscreen or windowed context based on config.ini
+    GLFWmonitor *monitor;
+    int window_width, window_height = 0;
+    if (config.GetBoolean("Screen", "Fullscreen", true))
+    {
+        monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    int window_width = mode->width;
-    int window_height = mode->height;
+        window_width = mode->width;
+        window_height = mode->height;
+    }
+    else
+    {
+        monitor = NULL;
+        window_width = config.GetInteger("Screen", "ScreenWidth", 800);
+        window_height = config.GetInteger("Screen", "ScreenHeight", 640);
+    }
     GLFWwindow *window = glfwCreateWindow(window_width, window_height, "STL Model Viewer", monitor, NULL);
     if (!window)
     {
@@ -62,13 +71,15 @@ int main(void)
 
     // Make the window's context current
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    // Set input callbacks
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    // Set vsync
+    glfwSwapInterval(1);
 
-    GL_CALL(glEnable(GL_DEPTH_TEST));
-    GL_CALL(glEnable(GL_CULL_FACE));  
-    GL_CALL(glEnable(GL_MULTISAMPLE));  
+    GL_CALL(glEnable(GL_DEPTH_TEST));   // Depth testing
+    GL_CALL(glEnable(GL_CULL_FACE));    // Rear face culling
+    GL_CALL(glEnable(GL_MULTISAMPLE));  // MSAA
 
     Shader shader("shaders/model/vertex.glsl", "shaders/model/fragment.glsl", "shaders/model/geometry.glsl");
 
