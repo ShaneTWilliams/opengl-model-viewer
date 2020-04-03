@@ -22,8 +22,8 @@ class Camera
     const glm::vec3 m_WORLD_UP_VEC = glm::vec3(0.0, 1.0, 0.0);
     float m_fov = 45.0f;
     float m_distance = 10.0;
-    float m_position_xangle = 315.0;
-    float m_position_yangle = 45.0;
+    float m_position_xangle = 90.0;
+    float m_position_yangle = 30.0;
     glm::vec3 m_position_coords = glm::vec3(0.0, 0.0, 0.0);
     glm::vec3 m_front_vec = glm::vec3(0.0, 0.0, -1.0);
     glm::vec3 m_up_vec = glm::vec3(0.0, 1.0, 0.0);
