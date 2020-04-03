@@ -7,7 +7,7 @@ file(GLOB SOURCES "src/*.cpp")
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/lib/glfw/include)
 include_directories(${CMAKE_SOURCE_DIR}/lib/assimp/include)
-include_directories(${CMAKE_SOURCE_DIR}/lib/stbimage/include)
+include_directories(${CMAKE_SOURCE_DIR}/lib/inih/include)
 include_directories(${CMAKE_SOURCE_DIR}/lib/glm/include)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
