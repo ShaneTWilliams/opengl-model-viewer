@@ -48,7 +48,7 @@ void Camera::orbit(float x_offset, float y_offset)
 
 void Camera::zoom(double y_offset)
 {
-    m_distance -= y_offset;
+    m_distance -= y_offset * m_zoom_sensitivity;
 
     if (m_distance < 1.0)
     {
@@ -60,14 +60,14 @@ void Camera::zoom(double y_offset)
 
 void Camera::widenFov(void)
 {
-    if (m_fov + m_fov_interval <= 90.0f)
-        m_fov += m_fov_interval;
+    if (m_fov + m_fov_sensitivity <= 90.0f)
+        m_fov += m_fov_sensitivity;
 }
 
 void Camera::narrowFov(void)
 {
-    if (m_fov - m_fov_interval >= 30.0f)
-        m_fov -= m_fov_interval;
+    if (m_fov - m_fov_sensitivity >= 30.0f)
+        m_fov -= m_fov_sensitivity;
 }
 
 glm::mat4 Camera::getViewMatrix(void)

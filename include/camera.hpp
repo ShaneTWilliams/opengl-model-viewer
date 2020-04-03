@@ -30,7 +30,8 @@ class Camera
     glm::vec3 m_right_vec = glm::vec3(1.0, 0.0, 0.0);
     float m_movement_speed = 10.0;
     float m_mouse_sensitivity = 0.3;
-    float m_fov_interval = 0.4;
+    float m_zoom_sensitivity = 0.5;
+    float m_fov_sensitivity = 0.4;
     void updateCameraVectors(void);
 
  public:
