@@ -59,6 +59,7 @@ int main(void)
         window_height = config.GetInteger("Screen", "ScreenHeight", 640);
     }
     GLFWwindow *window = glfwCreateWindow(window_width, window_height, "STL Model Viewer", monitor, NULL);
+    camera.setScreenDimensions(window_width, window_height);
     if (!window)
     {
         glfwTerminate();
@@ -77,10 +78,16 @@ int main(void)
     GL_CALL(glEnable(GL_CULL_FACE));    // Rear face culling
     GL_CALL(glEnable(GL_MULTISAMPLE));  // MSAA
 
+    // Set up input sensitivities
+    float mouse_sensitivity = config.GetFloat("Input", "MouseSensitivity", 0.3);
+    float zoom_sensitivity = config.GetFloat("Input", "ZoomSensitivity", 0.5);
+    float fov_sensitivity = config.GetFloat("Input", "FovSensitivity", 0.4);
+    camera.setSensitivities(mouse_sensitivity, zoom_sensitivity, fov_sensitivity);
+
     // Instantiate, compile and link shader
     Shader shader(
-        "shaders/model/vertex.glsl", 
-        "shaders/model/fragment.glsl", 
+        "shaders/model/vertex.glsl",
+        "shaders/model/fragment.glsl",
         "shaders/model/geometry.glsl"
     );
     shader.use(); // There is only have one shader so this one can remain attached

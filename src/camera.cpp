@@ -1,8 +1,7 @@
 #include "camera.hpp"
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-
-#include <iostream>
 
 Camera::Camera(void)
 {
@@ -17,9 +16,9 @@ void Camera::updateCameraVectors(void)
         glm::sin(glm::radians(m_position_xangle)) * glm::cos(glm::radians(m_position_yangle))
     );
     m_position_coords *= glm::vec3(m_distance);
-    m_front_vec = glm::normalize(m_position_coords) * glm::vec3(-1.0);
-    m_right_vec = glm::normalize(glm::cross(m_front_vec, m_WORLD_UP_VEC));
-    m_up_vec = glm::normalize(glm::cross(m_right_vec, m_front_vec));
+    glm::vec3 front_vec = glm::normalize(m_position_coords) * glm::vec3(-1.0);
+    glm::vec3 right_vec = glm::normalize(glm::cross(front_vec, m_WORLD_UP_VEC));
+    m_up_vec = glm::normalize(glm::cross(right_vec, front_vec));
 }
 
 void Camera::orbit(float x_offset, float y_offset)
@@ -43,6 +42,7 @@ void Camera::orbit(float x_offset, float y_offset)
     {
         m_position_yangle = -89.0;
     }
+
     updateCameraVectors();
 }
 
@@ -70,6 +70,18 @@ void Camera::narrowFov(void)
         m_fov -= m_fov_sensitivity;
 }
 
+void Camera::setScreenDimensions(unsigned int width, unsigned int height)
+{
+    m_screen_width  = width;
+    m_screen_height = height;
+}
+
+void Camera::setSensitivities(float mouse_sensitivity, float zoom_sensitivity, float fov_sensitivity){
+    m_mouse_sensitivity = mouse_sensitivity;
+    m_zoom_sensitivity  = zoom_sensitivity;
+    m_fov_sensitivity   = fov_sensitivity;
+}
+
 glm::mat4 Camera::getViewMatrix(void)
 {
     return glm::lookAt(m_position_coords, glm::vec3(0.0, 0.0, 0.0), m_up_vec);
@@ -77,6 +89,6 @@ glm::mat4 Camera::getViewMatrix(void)
 
 glm::mat4 Camera::getProjMatrix(void)
 {
-    return glm::perspective(glm::radians(m_fov), 800.0f / 600.0f, 0.1f, 100.0f);
+    return glm::perspective(glm::radians(m_fov), (float)(m_screen_width / m_screen_height), 0.1f, 100.0f);
 }
 
