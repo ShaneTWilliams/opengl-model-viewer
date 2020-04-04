@@ -1,9 +1,3 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <csignal>
-
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/gl3.h>
 
@@ -19,13 +13,14 @@
 #include "mesh.hpp"
 #include "model.hpp"
 
+
 void process_keypresses(GLFWwindow *window, float deltaTime);
 void mouse_callback(GLFWwindow *window, double x_pos, double y_pos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
 Camera camera;
 
-float last_x, last_y = 0.0;
+float last_x, last_y;
 bool first_mouse = true;
 
 int main(void)
