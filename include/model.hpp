@@ -2,25 +2,26 @@
 
 #include <string>
 #include <vector>
-#include "assimp/Importer.hpp"
 #include "assimp/scene.h"
-#include "assimp/postprocess.h"
 #include "shader.hpp"
 #include "mesh.hpp"
 
 class Model
 {
 private:
-    /*  Model Data  */
     std::vector<Mesh> m_meshes;
-    std::string m_directory;
 
-    /*  Functions   */
+    // Load model and call processNode
     void loadModel(std::string path);
+    // Recursively process each Node by calling processMesh on each node's 
+    // meshes and adding them to m_meshes vector
     void processNode(aiNode *node, const aiScene *scene);
+    // Create mesh object with vertex and index daa
     Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 
 public:
     Model(std::string path);
+
+    // Call draw function of all meshes in m_meshes
     void Draw(Shader shader);
 };
