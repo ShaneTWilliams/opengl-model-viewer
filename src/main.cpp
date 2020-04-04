@@ -19,18 +19,14 @@
 #include "mesh.hpp"
 #include "model.hpp"
 
-void process_input(GLFWwindow *window, float deltaTime);
+void process_keypresses(GLFWwindow *window, float deltaTime);
 void mouse_callback(GLFWwindow *window, double x_pos, double y_pos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 
 Camera camera;
 
-const unsigned int SCR_WIDTH = 1920;
-const unsigned int SCR_HEIGHT = 1080;
-float last_x = SCR_WIDTH / 2.0f;
-float last_y = SCR_HEIGHT / 2.0f;
+float last_x, last_y = 0.0;
 bool first_mouse = true;
-float explode_distance = 2.0;
 
 int main(void)
 {
@@ -38,13 +34,13 @@ int main(void)
 
     if (!glfwInit())
         return -1;
-
+    
     glfwWindowHint(GLFW_SAMPLES, 4);
     // We need to explicitly ask for a 4.1, core profile context on OS X
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Open fullscreen or windowed context based on config.ini
     GLFWmonitor *monitor;
@@ -52,7 +48,7 @@ int main(void)
     if (config.GetBoolean("Screen", "Fullscreen", true))
     {
         monitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         window_width = mode->width;
         window_height = mode->height;
     }
@@ -81,37 +77,105 @@ int main(void)
     GL_CALL(glEnable(GL_CULL_FACE));    // Rear face culling
     GL_CALL(glEnable(GL_MULTISAMPLE));  // MSAA
 
-    Shader shader("shaders/model/vertex.glsl", "shaders/model/fragment.glsl", "shaders/model/geometry.glsl");
+    // Instantiate, compile and link shader
+    Shader shader(
+        "shaders/model/vertex.glsl", 
+        "shaders/model/fragment.glsl", 
+        "shaders/model/geometry.glsl"
+    );
+    shader.use(); // There is only have one shader so this one can remain attached
 
-    Model ourModel("alien.stl");
+    // Instantiate and load model
+    Model ourModel(config.Get("Model", "Path", ""));
 
-   
+    // Build model matrix
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::vec3 model_translate_vec = glm::vec3(
+        config.GetFloat("Model", "TranslateX", 0.0),
+        config.GetFloat("Model", "TranslateY", 0.0),
+        config.GetFloat("Model", "TranslateZ", 0.0)
+    );
+    glm::vec3 model_scale = glm::vec3(
+        config.GetFloat("Model", "ScaleXYZ", 1.0)
+    );
+    float model_rotate_angle = glm::radians(
+        config.GetFloat("Model", "RotateAngle", 0.0)
+    );
+    glm::vec3 model_rotate_axis = glm::vec3(
+        config.GetFloat("Model", "RotateAxisX", 0.0),
+        config.GetFloat("Model", "RotateAxisY", 0.0),
+        config.GetFloat("Model", "RotateAxisZ", 0.0)
+    );
+    model = glm::translate(model, model_translate_vec);
+    model = glm::scale(model, model_scale);
+    model = glm::rotate(model, model_rotate_angle, model_rotate_axis);
+    // Send model matrix to vertex shader as it remains constant
+    shader.setMat4("model", model);  
 
+    // Set fragment shader uniforms
+    // Material lighting properties
+    glm::vec3 material_ambient = glm::vec3(
+        config.GetFloat("Material", "AmbientColorR", 1.0),
+        config.GetFloat("Material", "AmbientColorG", 1.0),
+        config.GetFloat("Material", "AmbientColorB", 1.0)
+    );
+    shader.setVec3("material.ambient", material_ambient);
+    glm::vec3 material_diffuse = glm::vec3(
+        config.GetFloat("Material", "DiffuseColorR", 1.0),
+        config.GetFloat("Material", "DiffuseColorG", 1.0),
+        config.GetFloat("Material", "DiffuseColorB", 1.0)
+    );
+    shader.setVec3("material.diffuse", material_diffuse);
+    glm::vec3 material_specular = glm::vec3(
+        config.GetFloat("Material", "SpecularColorR", 1.0),
+        config.GetFloat("Material", "SpecularColorG", 1.0),
+        config.GetFloat("Material", "SpecularColorB", 1.0)
+    );
+    shader.setVec3("material.specular", material_specular);
+    float material_shininess = config.GetFloat("Material", "Shininess", 32.0);
+    shader.setFloat("material.shininess", material_shininess);
+
+    // Light lighting properties
+    glm::vec3 light_ambient = glm::vec3(
+        config.GetFloat("Light", "AmbientColorR", 1.0),
+        config.GetFloat("Light", "AmbientColorG", 1.0),
+        config.GetFloat("Light", "AmbientColorB", 1.0));
+    shader.setVec3("light.ambient", light_ambient);
+    glm::vec3 light_diffuse = glm::vec3(
+        config.GetFloat("Light", "DiffuseColorR", 1.0),
+        config.GetFloat("Light", "DiffuseColorG", 1.0),
+        config.GetFloat("Light", "DiffuseColorB", 1.0));
+    shader.setVec3("light.diffuse", light_diffuse);
+    glm::vec3 light_specular = glm::vec3(
+        config.GetFloat("Light", "SpecularColorR", 1.0),
+        config.GetFloat("Light", "SpecularColorG", 1.0),
+        config.GetFloat("Light", "SpecularColorB", 1.0));
+    shader.setVec3("light.specular", light_specular);
+
+    // Background color
+    glm::vec3 background_color = glm::vec3(
+        config.GetFloat("Graphics", "BackgroundColorR", 0.0),
+        config.GetFloat("Graphics", "BackgroundColorG", 0.0),
+        config.GetFloat("Graphics", "BackgroundColorB", 0.0)
+    );
+
+    float explode_distance = 2.0;
+    bool should_explode = config.GetBoolean("Graphics", "ExplodeOnStart", true); 
     float deltaTime,
     currentFrame, lastFrame = 0;
-
-    // Loop until the user closes the window
     while (!glfwWindowShouldClose(window))
     {
-        // time
+        // Delta time calculations
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        GL_CALL(glClearColor(0.2f, 0.3f, 0.3f, 1.0f));
+        GL_CALL(glClearColor(background_color.r, background_color.g, 
+                                background_color.b, 1.0f));
         GL_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-        // model/world matrices
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0, -1.0, 0.0));
-        model = glm::scale(model, glm::vec3(0.05));
-        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0));
-        glm::mat4 view = camera.getViewMatrix();
-        glm::mat4 projection = camera.getProjMatrix();
-
-        // vertex shader uniforms
-        shader.use();
-        if (explode_distance > 0)
+        // Vertex shader uniforms
+        if (explode_distance > 0 && should_explode)
         {
             explode_distance -= 0.01;
         }
@@ -120,28 +184,18 @@ int main(void)
             explode_distance = 0;
         }
         shader.setFloat("distance", explode_distance);
-        shader.setMat4("model", model);
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
-        // fragment shader uniforms
-        shader.setVec3("material.ambient", glm::vec3(0.7, 0.7, 0.7));
-        shader.setVec3("material.diffuse", glm::vec3(0.8, 0.8, 0.8));
-        shader.setVec3("material.specular", glm::vec3(0.1, 0.1, 0.1));
-        shader.setFloat("material.shininess", 32.0f);
-        shader.setVec3("light.ambient",  glm::vec3(0.2, 0.2, 0.2));
-        shader.setVec3("light.diffuse",  glm::vec3(0.5, 0.5, 0.5)); 
-        shader.setVec3("light.specular", glm::vec3(0.8, 0.8, 0.8)); 
-        shader.setVec3("light.position", glm::vec3(50.0, 50.0, 50.0));
+        shader.setMat4("view", camera.getViewMatrix());
+        shader.setMat4("projection", camera.getProjMatrix());
+        shader.setVec3("light.position", camera.getPosition());
+        shader.setVec3("view_pos", camera.getPosition());
+
+        // The magic line of code 
         ourModel.Draw(shader);
-        // model = glm::mat4(1.0f);
-        // model = glm::translate(model, glm::vec3(5.0, 5.0, 5.0));
-        // model = glm::scale(model, glm::vec3(0.05, 0.05, 0.05));
-        // shader.setMat4("model", model);
-        // ourModel.Draw(shader);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
-        process_input(window, deltaTime);
+
+        process_keypresses(window, deltaTime);
     }
 
     GL_CALL(glDeleteProgram(shader.get_id()));
@@ -149,14 +203,8 @@ int main(void)
     return 0;
 }
 
-void process_input(GLFWwindow *window, float delta_time)
-{
-    bool slow = false;
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-    {
-        slow = true;
-    }
-    
+void process_keypresses(GLFWwindow *window, float delta_time)
+{    
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
@@ -166,7 +214,6 @@ void process_input(GLFWwindow *window, float delta_time)
     {
         camera.narrowFov();
     }
-
     if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS)
     {
         camera.widenFov();
