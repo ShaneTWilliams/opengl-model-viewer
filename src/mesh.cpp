@@ -38,6 +38,6 @@ void Mesh::setupMesh(void)
 void Mesh::Draw(Shader shader)
 {
     GL_CALL(glBindVertexArray(m_vao));
-    GL_CALL(glDrawElements(GL_TRIANGLES, m_indices.size(), GL_INT, 0));
+    GL_CALL(glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, 0));
     GL_CALL(glBindVertexArray(0));  // Unbind vao
 }

@@ -72,6 +72,10 @@ int main(void)
     GL_CALL(glEnable(GL_DEPTH_TEST));   // Depth testing
     GL_CALL(glEnable(GL_CULL_FACE));    // Rear face culling
     GL_CALL(glEnable(GL_MULTISAMPLE));  // MSAA
+    if (config.GetBoolean("Graphics", "Wireframe", false))
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
 
     // Set up input sensitivities
     float mouse_sensitivity = config.GetFloat("Input", "MouseSensitivity", 0.3);
