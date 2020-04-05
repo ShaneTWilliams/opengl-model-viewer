@@ -1,6 +1,6 @@
 # OpenGL Model Viewer
 
-This project is a real-time renderer for .stl format files, built using the OpenGL graphics API. I primarily used Joey de Vries' tutorials at <www.learnopengl.com> to teach myself OpenGL, and they inspired much of this design. 
+This project is a real-time renderer for .stl format files, built using the OpenGL graphics API. I primarily used Joey de Vries' tutorials at [learnopengl.com](www.learnopengl.com) to teach myself OpenGL, and they inspired much of this design. 
 
 ## Features
 Fully adjustable ambient, diffuse and specular (Phong) lighting
@@ -45,11 +45,11 @@ _Sample models retrieved from turbosquid.com:_
 ## Dependencies
 |Library|Description|Link|
 |:-:|:-:|:-:|
-| OpenGL | Open-source graphics API, written by graphics hardware manufacturers. This project uses version 4.1 as it is pre-installed on all modern MacOS devices | <opengl.org> |
-| GLFW | Cross-platform library used for window management, OpenGL context management, and user input processing | <glfw.org> |
-| Assimp | Library for importing 3D models | <assimp.org> |
-| GLM | Math library for OpenGL programming, designed with GLSL in mind. Used for vector and matrix operations | <glm.g-truc.net> |
-|inih| .ini file parsing library. Used to parse config.ini | Original library: <github.com/benhoyt/inih> Version used: <github.com/jtilly/inih> (header-only) |
+| OpenGL | Open-source graphics API, written by graphics hardware manufacturers. This project uses version 4.1 as it is pre-installed on all modern MacOS devices | [Website](www.opengl.org) |
+| GLFW | Cross-platform library used for window management, OpenGL context management, and user input processing | [Website](www.glfw.org) |
+| Assimp | Library for importing 3D models | [Website](www.assimp.org) |
+| GLM | Math library for OpenGL programming, designed with GLSL in mind. Used for vector and matrix operations | [Website](www.glm.g-truc.net) |
+|inih| .ini file parsing library. Used to parse config.ini | [Original Library](www.github.com/benhoyt/inih) <br> [Header-only version used](www.github.com/jtilly/inih) |
 
 ## Build
 _This project has not been tested on any platforms other than my development machine (2018 MBP). I may look into improving this in the future._
