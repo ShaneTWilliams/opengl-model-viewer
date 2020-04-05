@@ -89,6 +89,6 @@ glm::mat4 Camera::getViewMatrix(void)
 
 glm::mat4 Camera::getProjMatrix(void)
 {
-    return glm::perspective(glm::radians(m_fov), (float)(m_screen_width / m_screen_height), 0.1f, 100.0f);
+    return glm::perspective(glm::radians(m_fov), (float)m_screen_width/(float)m_screen_height, 0.1f, 100.0f);
 }
 
