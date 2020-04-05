@@ -3,6 +3,8 @@ A viewer for STL files using OpenGL
 
 ## Features & Images
 
+[Elephant](https://giphy.com/gifs/Ke7jIphBeAddHeqnkP)
+
 ## Dependencies
 
 |Library|Description|Link|
