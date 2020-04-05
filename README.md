@@ -33,7 +33,7 @@ _Sample models retrieved from turbosquid.com:_
 
 ## Files
 | File | Contents |
-|:-:|:-:|:-:|
+|:-:|:-:|
 | main.cpp | config.ini file parsing, GLFW setup, OpenGL setup, input processing functions and main rendering loop |
 | camera.hpp/cpp | Camera class: stores camera position and angle state, handles camera movement and FOV adjustment, calculates view and projection matrices |
 | mesh.hpp/cpp | Mesh class: loads and stores mesh vertices and indices, draws meshes |
