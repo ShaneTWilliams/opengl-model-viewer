@@ -1,6 +1,6 @@
 # OpenGL Model Viewer
 
-This project is a real-time renderer for .stl format files, built using the OpenGL graphics API. I primarily used Joey de Vries' tutorials at <learnopengl.com> to teach myself OpenGL, and they inspired much of this design. 
+This project is a real-time renderer for .stl format files, built using the OpenGL graphics API. I primarily used Joey de Vries' tutorials at <www.learnopengl.com> to teach myself OpenGL, and they inspired much of this design. 
 
 ## Features
 Fully adjustable ambient, diffuse and specular (Phong) lighting
