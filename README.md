@@ -45,11 +45,11 @@ _Sample models retrieved from turbosquid.com:_
 ## Dependencies
 |Library|Description|Link|
 |:-:|:-:|:-:|
-| OpenGL | Open-source graphics API, written by graphics hardware manufacturers. This project uses version 4.1 as it is pre-installed on all modern MacOS devices | [Website](www.opengl.org) |
-| GLFW | Cross-platform library used for window management, OpenGL context management, and user input processing | [Website](www.glfw.org) |
-| Assimp | Library for importing 3D models | [Website](www.assimp.org) |
-| GLM | Math library for OpenGL programming, designed with GLSL in mind. Used for vector and matrix operations | [Website](www.glm.g-truc.net) |
-|inih| .ini file parsing library. Used to parse config.ini | [Original Library](www.github.com/benhoyt/inih) <br> [Header-only version used](www.github.com/jtilly/inih) |
+| OpenGL | Open-source graphics API, written by graphics hardware manufacturers. This project uses version 4.1 as it is pre-installed on all modern MacOS devices | [Website](https://www.opengl.org) |
+| GLFW | Cross-platform library used for window management, OpenGL context management, and user input processing | [Website](https://www.glfw.org) |
+| Assimp | Library for importing 3D models | [Website](https://www.assimp.org) |
+| GLM | Math library for OpenGL programming, designed with GLSL in mind. Used for vector and matrix operations | [Website](https://www.glm.g-truc.net) |
+|inih| .ini file parsing library. Used to parse config.ini | [Original Library](https://www.github.com/benhoyt/inih) <br> [Header-only version used](https://www.github.com/jtilly/inih) |
 
 ## Build
 _This project has not been tested on any platforms other than my development machine (2018 MBP). I may look into improving this in the future._
